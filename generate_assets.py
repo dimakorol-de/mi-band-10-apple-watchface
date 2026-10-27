@@ -8,12 +8,11 @@ assets_dir = "assets"
 
 print("--- Скрипт запущен! ---")
 
-# 1. Принудительно удаляем старые битые картинки, чтобы они не мешались
+# 1. Удаляем старые png, если они есть
 if os.path.exists(assets_dir):
     for file in os.listdir(assets_dir):
         if file.lower().endswith('.png'):
             os.remove(os.path.join(assets_dir, file))
-            print(f"Удалён старый файл: {file}")
 
 # 2. Ищем загруженный шрифт
 font_path = None
@@ -28,32 +27,26 @@ if not font_path:
     print("КРИТИЧЕСКАЯ ОШИБКА: Шрифт не найден в папке assets!")
     exit(1)
 
-# Загружаем шрифт (размер 90, чтобы цифра была крупной на холсте-заготовке)
-try:
-    font = ImageFont.truetype(font_path, 90)
-except Exception as e:
-    print(f"Критическая ошибка при чтении шрифта: {e}")
-    exit(1)
+# Загружаем шрифт (размер 90)
+font = ImageFont.truetype(font_path, 90)
 
-# 3. Генерируем новые, гарантированно заполненные цифры
+# 3. Генерируем новые цифры с принудительным центрированием anchor="mm"
 for i in range(10):
     text = str(i)
     
-    # --- Основной набор ---
+    # --- Основной набор (Stretched) ---
     temp_img = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
     temp_draw = ImageDraw.Draw(temp_img)
     
-    # Пишем цифру в левый верхний угол заготовки, чтобы она точно прорисовалась
-    temp_draw.text((10, 10), text, fill=(255, 255, 255, 255), font=font)
+    # anchor="mm" ставит математический центр самой цифры в координаты (100, 100) холста
+    temp_draw.text((100, 100), text, fill=(255, 255, 255, 255), font=font, anchor="mm")
     
-    # Обрезаем холст строго по контуру прорисованной цифры
     bbox = temp_img.getbbox()
     if bbox is None:
-        print(f"Внимание: Не удалось прорисовать цифру {text}! Проверяем параметры.")
+        print(f"Внимание: Не удалось прорисовать цифру {text}!")
         continue
         
     cropped = temp_img.crop(bbox)
-    # Силой растягиваем её до нужных нам пропорций 50x115
     stretched = cropped.resize((FINAL_W, FINAL_H), Image.Resampling.LANCZOS)
     stretched.save(f"assets/Stretched_{i}.png", "PNG")
     print(f"Успешно создана цифра Stretched_{i}.png (Размер: {stretched.size})")
@@ -61,16 +54,16 @@ for i in range(10):
     # --- Набор для режима ожидания (AOD) ---
     temp_aod = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
     temp_draw_aod = ImageDraw.Draw(temp_aod)
-    # Рисуем контур толщиной в 4 пикселя
-    temp_draw_aod.text((10, 10), text, fill=(0, 0, 0, 0), 
-                       stroke_width=4, stroke_fill=(255, 255, 255, 255), font=font)
+    
+    # Рисуем только контур, тоже центрируя по "mm"
+    temp_draw_aod.text((100, 100), text, fill=(0, 0, 0, 0), 
+                       stroke_width=4, stroke_fill=(255, 255, 255, 255), font=font, anchor="mm")
     
     bbox_aod = temp_aod.getbbox()
     if bbox_aod:
         cropped_aod = temp_aod.crop(bbox_aod)
         stretched_aod = cropped_aod.resize((FINAL_W, FINAL_H), Image.Resampling.LANCZOS)
         stretched_aod.save(f"assets/AOD_{i}.png", "PNG")
-        print(f"Успешно создана AOD цифра AOD_{i}.png")
 
 print("--- Все 20 картинок созданы! Начинаем упаковку. ---")
 
