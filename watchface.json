@@ -1,9 +1,10 @@
 {
   "sdk_version": "3.0.0",
-  "device": "xiaomi.smartband.10",
+  "device_id": "xiaomi.smartband.10",
+  "device_type": "smart_band",
   "meta": {
     "name": "Apple Style Fixed",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "author": "Custom",
     "description": "Apple Watch Stretched Style with Fixed Complication"
   },
@@ -15,8 +16,8 @@
   "theme": {
     "default_color_index": 0,
     "color_palettes": [
-      { "name": "Pure White", "primary": "#FFFFFF", "secondary": "#888888" },
-      { "name": "Apple Gold", "primary": "#E6C79C", "secondary": "#7D6B53" }
+      { "name": "Apple Umber", "primary": "#D4A373", "secondary": "#7A5C43" },
+      { "name": "Pure White", "primary": "#FFFFFF", "secondary": "#888888" }
     ]
   },
   "views": {
@@ -65,7 +66,7 @@
           "x": 96, "y": 120,
           "align": "center",
           "spacing": -1,
-          "resource_prefix": "assets/AOD_",
+          "resource_prefix": "assets/Stretched_",
           "color_mask": "@theme.secondary"
         }
       ]
