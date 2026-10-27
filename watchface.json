@@ -4,7 +4,7 @@
   "device_type": "smart_band",
   "meta": {
     "name": "Apple Style Fixed",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "author": "Custom",
     "description": "Apple Watch Stretched Style with Fixed Complication"
   },
