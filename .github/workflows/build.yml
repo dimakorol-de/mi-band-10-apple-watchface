@@ -21,16 +21,11 @@ jobs:
     - name: Install Pillow
       run: pip install Pillow
 
-    - name: Generate Perfect Digits from Font
+    - name: Run Script Generator and Packager
       run: python generate_assets.py
 
-    - name: Compile Official HyperOS BIN via Native Console
-      run: |
-        # Используем стандартную консольную утилиту zip, которую понимает мод Mi Fitness
-        zip -0r AppleStyleFixed.bin watchface.json assets/
-
-    - name: Upload Finished Watchface
+    - name: Upload Finished Watchface (.rpk)
       uses: actions/upload-artifact@v4
       with:
         name: AppleStyleMinimal-MiBand10
-        path: AppleStyleFixed.bin
+        path: AppleStyleFixed.rpk
