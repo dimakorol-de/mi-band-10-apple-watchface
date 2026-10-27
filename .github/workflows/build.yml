@@ -21,11 +21,25 @@ jobs:
     - name: Install Pillow
       run: pip install Pillow
 
-    - name: Run Script Generator and Packager
+    - name: Generate Perfect Digits
       run: python generate_assets.py
 
-    - name: Upload Finished Watchface (.bin)
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Official Xiaomi Watchface Tool
+      run: npm install -g @xiaomi/watchface-cli
+
+    - name: Compile Official HyperOS BIN
+      run: |
+        xiaomi-wf build --config watchface.json --output ./dist
+        # Переименовываем выходной файл для удобства
+        mv ./dist/*.bin ./dist/AppleStyleFixed.bin
+
+    - name: Upload Finished Watchface
       uses: actions/upload-artifact@v4
       with:
         name: AppleStyleMinimal-MiBand10
-        path: AppleStyleFixed.bin
+        path: ./dist/AppleStyleFixed.bin
