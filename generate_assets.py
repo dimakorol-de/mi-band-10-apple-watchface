@@ -17,7 +17,7 @@ if os.path.exists(assets_dir):
 else:
     os.makedirs(assets_dir)
 
-# 2. Ищем загруженный шрифт
+# 2. Ищем загруженный шрифт в папке assets
 font_path = None
 if os.path.exists(assets_dir):
     for file in os.listdir(assets_dir):
@@ -35,7 +35,7 @@ if font_path:
 if font is None:
     font = ImageFont.load_default()
 
-# 3. Генерируем 10 идеальных вытянутых цифр
+# 3. Генерируем 10 идеаческих вытянутых цифр часов
 for i in range(10):
     text = str(i)
     temp_img = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
@@ -139,15 +139,16 @@ with open("watchface.json", "w", encoding="utf-8") as f:
 
 print("Файл watchface.json успешно перезаписан на чистый вариант!")
 
-# 5. Собираем финальный .bin БЕЗ скрытых системных тегов Linux (UT)
-watchface_bin_path = "AppleStyleFixed.bin"
-with zipfile.ZipFile(watchface_bin_path, 'w', zipfile.ZIP_STORED) as zipf:
-    # Принудительно очищаем системные метаданные для совместимости с Mi Fitness
+# 5. Собираем финальный файл в ОФИЦИАЛЬНОМ формате .RPK без скрытых тегов Linux
+watchface_rpk_path = "AppleStyleFixed.rpk"
+with zipfile.ZipFile(watchface_rpk_path, 'w', zipfile.ZIP_STORED) as zipf:
+    # Очищаем метаданные для watchface.json
     json_info = zipfile.ZipInfo("watchface.json")
     json_info.create_system = 0  # Игнорировать Unix-атрибуты (убирает UT)
     with open("watchface.json", "r", encoding="utf-8") as f:
         zipf.writestr(json_info, f.read())
     
+    # Очищаем метаданные для каждой картинки
     for i in range(10):
         img_name = f"Stretched_{i}.png"
         local_path = os.path.join(assets_dir, img_name)
@@ -157,4 +158,4 @@ with zipfile.ZipFile(watchface_bin_path, 'w', zipfile.ZIP_STORED) as zipf:
             with open(local_path, "rb") as f:
                 zipf.writestr(img_info, f.read())
 
-print(f"Сборка полностью завершена по стандартам HyperOS: {watchface_bin_path}")
+print(f"Сборка полностью завершена в правильном формате RPK: {watchface_rpk_path}")
