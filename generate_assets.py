@@ -9,11 +9,13 @@ assets_dir = "assets"
 
 print("--- Скрипт запущен! ---")
 
-# 1. Очищаем старые картинки
+# 1. Очищаем старые картинки в рабочей папке сервера
 if os.path.exists(assets_dir):
     for file in os.listdir(assets_dir):
         if file.lower().endswith('.png'):
             os.remove(os.path.join(assets_dir, file))
+else:
+    os.makedirs(assets_dir)
 
 # 2. Ищем загруженный шрифт
 font_path = None
@@ -33,7 +35,7 @@ if font_path:
 if font is None:
     font = ImageFont.load_default()
 
-# 3. Генерируем 10 вытянутых цифр
+# 3. Генерируем 10 идеальных вытянутых цифр
 for i in range(10):
     text = str(i)
     temp_img = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
@@ -55,7 +57,7 @@ for i in range(10):
 
 print("Картинки успешно сгенерированы!")
 
-# 4. Принудительно генерируем чистый watchface.json программно
+# 4. Генерируем абсолютно ЧИСТЫЙ watchface.json программно на сервере
 wf_data = {
   "sdk_version": "3.0.0",
   "device_id": "xiaomi.smartband.10",
@@ -132,12 +134,13 @@ wf_data = {
   }
 }
 
+# Записываем чистую конфигурацию поверх старой в рабочей среде сборщика
 with open("watchface.json", "w", encoding="utf-8") as f:
     json.dump(wf_data, f, indent=2, ensure_ascii=False)
 
-print("Файл watchface.json успешно перезаписан!")
+print("Файл watchface.json успешно перезаписан на чистый вариант!")
 
-# 5. Собираем финальный .bin
+# 5. Собираем финальный .bin с правильным несжатым методом (ZIP_STORED) для мода
 watchface_bin_path = "AppleStyleFixed.bin"
 with zipfile.ZipFile(watchface_bin_path, 'w', zipfile.ZIP_STORED) as zipf:
     zipf.write("watchface.json", "watchface.json")
@@ -147,4 +150,4 @@ with zipfile.ZipFile(watchface_bin_path, 'w', zipfile.ZIP_STORED) as zipf:
         if os.path.exists(local_path):
             zipf.write(local_path, f"assets/{img_name}")
 
-print(f"Сборка завершена: {watchface_bin_path}")
+print(f"Сборка полностью завершена: {watchface_bin_path}")
