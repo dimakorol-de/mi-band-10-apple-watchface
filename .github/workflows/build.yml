@@ -21,22 +21,16 @@ jobs:
     - name: Install Pillow
       run: pip install Pillow
 
-    - name: Generate Perfect Digits
+    - name: Generate Perfect Digits from Font
       run: python generate_assets.py
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-
-    - name: Install Xiaomi Vela CLI
-      run: npm install -g @xiaomi/vela-watchface-cli
-
-    - name: Build Watchface Package
-      run: vela-wf build --config watchface.json --output ./dist
-
+    - name: Package Watchface to BIN
+      run: |
+        mkdir -p dist
+        zip -r dist/AppleStyleFixed.bin watchface.json assets/
+        
     - name: Upload Finished Watchface
       uses: actions/upload-artifact@v4
       with:
         name: AppleStyleMinimal-MiBand10
-        path: ./dist/*.bin
+        path: dist/AppleStyleFixed.bin
