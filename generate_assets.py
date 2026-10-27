@@ -35,7 +35,7 @@ if font_path:
 if font is None:
     font = ImageFont.load_default()
 
-# 3. Генерируем 10 идеаческих вытянутых цифр часов
+# 3. Генерируем 10 идеальных вытянутых цифр часов
 for i in range(10):
     text = str(i)
     temp_img = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
@@ -139,7 +139,7 @@ with open("watchface.json", "w", encoding="utf-8") as f:
 
 print("Файл watchface.json успешно перезаписан на чистый вариант!")
 
-# 5. Собираем финальный файл в ОФИЦИАЛЬНОМ формате .RPK без скрытых тегов Linux
+# 5. Собираем финальный файл в официальном формате .rpk без скрытых тегов Linux
 watchface_rpk_path = "AppleStyleFixed.rpk"
 with zipfile.ZipFile(watchface_rpk_path, 'w', zipfile.ZIP_STORED) as zipf:
     # Очищаем метаданные для watchface.json
