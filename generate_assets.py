@@ -116,7 +116,7 @@ wf_data = {
       ]
     },
     "aod": {
-      "enabled": true,
+      "enabled": True,
       "background": { "color": "#000000" },
       "components": [
         {
