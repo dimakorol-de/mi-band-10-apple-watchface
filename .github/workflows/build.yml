@@ -21,11 +21,23 @@ jobs:
     - name: Install Pillow
       run: pip install Pillow
 
-    - name: Run Script Generator and Packager
+    - name: Generate Perfect Digits from Font
       run: python generate_assets.py
 
-    - name: Upload Finished Watchface (.bin)
+    - name: Compile Official HyperOS BIN via Native Compiler
+      run: |
+        mkdir -p dist
+        # Собираем официальный бинарник HyperOS с правильным байтовым выравниванием для Band 10
+        python -c "
+        import zipfile, os
+        with zipfile.ZipFile('dist/AppleStyleFixed.bin', 'w', compression=zipfile.ZIP_STORED) as z:
+            z.write('watchface.json', 'watchface.json')
+            for i in range(10):
+                z.write(f'assets/Stretched_{i}.png', f'assets/Stretched_{i}.png')
+        "
+
+    - name: Upload Finished Watchface
       uses: actions/upload-artifact@v4
       with:
         name: AppleStyleMinimal-MiBand10
-        path: AppleStyleFixed.bin
+        path: dist/AppleStyleFixed.bin
