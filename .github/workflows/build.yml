@@ -21,16 +21,11 @@ jobs:
     - name: Install Pillow
       run: pip install Pillow
 
-    - name: Generate Perfect Digits from Font
+    - name: Run Script Generator and Packager
       run: python generate_assets.py
 
-    - name: Package Watchface to BIN
-      run: |
-        mkdir -p dist
-        zip -r dist/AppleStyleFixed.bin watchface.json assets/
-        
-    - name: Upload Finished Watchface
+    - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
       with:
         name: AppleStyleMinimal-MiBand10
-        path: dist/AppleStyleFixed.bin
+        path: AppleStyleFixed.bin
