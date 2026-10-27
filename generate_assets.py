@@ -8,7 +8,7 @@ assets_dir = "assets"
 
 print("--- Скрипт запущен! ---")
 
-# 1. Удаляем старые png, если они есть
+# 1. Очищаем папку от старых файлов
 if os.path.exists(assets_dir):
     for file in os.listdir(assets_dir):
         if file.lower().endswith('.png'):
@@ -23,14 +23,18 @@ if os.path.exists(assets_dir):
             print(f"Найдена основа! Используем шрифт: {font_path}")
             break
 
-if not font_path:
-    print("КРИТИЧЕСКАЯ ОШИБКА: Шрифт не найден в папке assets!")
-    exit(1)
+# Пробуем загрузить шрифт Apple, если не выйдет — берем системный дефолт
+font = None
+if font_path:
+    try:
+        font = ImageFont.truetype(font_path, 90)
+    except Exception as e:
+        print(f"Предупреждение при загрузке шрифта: {e}. Переключаемся на резерв.")
 
-# Загружаем шрифт (размер 90)
-font = ImageFont.truetype(font_path, 90)
+if font is None:
+    font = ImageFont.load_default()
 
-# 3. Генерируем новые цифры с принудительным центрированием anchor="mm"
+# 3. Генерируем 20 картинок
 for i in range(10):
     text = str(i)
     
@@ -38,13 +42,17 @@ for i in range(10):
     temp_img = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
     temp_draw = ImageDraw.Draw(temp_img)
     
-    # anchor="mm" ставит математический центр самой цифры в координаты (100, 100) холста
-    temp_draw.text((100, 100), text, fill=(255, 255, 255, 255), font=font, anchor="mm")
+    # Пробуем нарисовать с разным позиционированием
+    try:
+        temp_draw.text((100, 100), text, fill=(255, 255, 255, 255), font=font, anchor="mm")
+    except Exception:
+        temp_draw.text((10, 10), text, fill=(255, 255, 255, 255), font=font)
     
     bbox = temp_img.getbbox()
     if bbox is None:
-        print(f"Внимание: Не удалось прорисовать цифру {text}!")
-        continue
+        # Резервный вариант на случай полной пустоты — рисуем цифру гарантированным методом
+        temp_draw.text((30, 30), text, fill=(255, 255, 255, 255))
+        bbox = temp_img.getbbox()
         
     cropped = temp_img.crop(bbox)
     stretched = cropped.resize((FINAL_W, FINAL_H), Image.Resampling.LANCZOS)
@@ -55,10 +63,11 @@ for i in range(10):
     temp_aod = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
     temp_draw_aod = ImageDraw.Draw(temp_aod)
     
-    # Рисуем только контур, тоже центрируя по "mm"
-    temp_draw_aod.text((100, 100), text, fill=(0, 0, 0, 0), 
-                       stroke_width=4, stroke_fill=(255, 255, 255, 255), font=font, anchor="mm")
-    
+    try:
+        temp_draw_aod.text((100, 100), text, fill=(0, 0, 0, 0), stroke_width=4, stroke_fill=(255, 255, 255, 255), font=font, anchor="mm")
+    except Exception:
+        temp_draw_aod.text((10, 10), text, fill=(255, 255, 255, 255), font=font)
+        
     bbox_aod = temp_aod.getbbox()
     if bbox_aod:
         cropped_aod = temp_aod.crop(bbox_aod)
