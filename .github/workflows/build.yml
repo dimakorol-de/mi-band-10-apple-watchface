@@ -26,11 +26,9 @@ jobs:
 
     - name: Compile Official HyperOS BIN via Native Compiler
       run: |
-        mkdir -p dist
-        # Собираем официальный бинарник HyperOS с правильным байтовым выравниванием для Band 10
         python -c "
         import zipfile, os
-        with zipfile.ZipFile('dist/AppleStyleFixed.bin', 'w', compression=zipfile.ZIP_STORED) as z:
+        with zipfile.ZipFile('AppleStyleFixed.bin', 'w', compression=zipfile.ZIP_STORED) as z:
             z.write('watchface.json', 'watchface.json')
             for i in range(10):
                 z.write(f'assets/Stretched_{i}.png', f'assets/Stretched_{i}.png')
@@ -40,4 +38,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: AppleStyleMinimal-MiBand10
-        path: dist/AppleStyleFixed.bin
+        path: AppleStyleFixed.bin
