@@ -24,15 +24,10 @@ jobs:
     - name: Generate Perfect Digits from Font
       run: python generate_assets.py
 
-    - name: Compile Official HyperOS BIN via Native Compiler
+    - name: Compile Official HyperOS BIN via Native Console
       run: |
-        python -c "
-        import zipfile, os
-        with zipfile.ZipFile('AppleStyleFixed.bin', 'w', compression=zipfile.ZIP_STORED) as z:
-            z.write('watchface.json', 'watchface.json')
-            for i in range(10):
-                z.write(f'assets/Stretched_{i}.png', f'assets/Stretched_{i}.png')
-        "
+        # Используем стандартную консольную утилиту zip, которую понимает мод Mi Fitness
+        zip -0r AppleStyleFixed.bin watchface.json assets/
 
     - name: Upload Finished Watchface
       uses: actions/upload-artifact@v4
