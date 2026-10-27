@@ -2,10 +2,10 @@
   "sdk_version": "3.0.0",
   "device": "xiaomi.smartband.10",
   "meta": {
-    "name": "Apple Style Minimal",
-    "version": "1.0.1",
+    "name": "Apple Style Fixed",
+    "version": "1.0.2",
     "author": "Custom",
-    "description": "Optimized Apple Watch Stretched Style"
+    "description": "Apple Watch Stretched Style with Fixed Complication"
   },
   "settings": {
     "fps": 30,
@@ -41,7 +41,8 @@
           "color_mask": "@theme.primary"
         },
         {
-          "type": "interactive_widget",
+          "type": "complication_slot",
+          "id": "slot_bottom",
           "x": 96, "y": 370,
           "align": "center",
           "radius": 28,
