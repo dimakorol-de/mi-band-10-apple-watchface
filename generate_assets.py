@@ -2,46 +2,54 @@ import os
 import zipfile
 from PIL import Image, ImageDraw, ImageFont
 
-# 1. Настройки отрисовки цифр под Mi Band 10
-W, H = 50, 115
+# Конечные размеры для Mi Band 10
+FINAL_W, FINAL_H = 50, 115
 font_path = "assets/SF-Pro-Rounded-Regular.ttf"
-font_size = 110
 
 if not os.path.exists(font_path):
     print(f"Ошибка: Шрифт не найден по пути {font_path}")
     exit(1)
 
-font = ImageFont.truetype(font_path, font_size)
+# Берем чуть меньший шрифт, чтобы цифра гарантированно прорисовалась на холсте-заготовке
+font = ImageFont.truetype(font_path, 70)
 
-# Генерируем 20 картинок
 for i in range(10):
     text = str(i)
     
-    # Основные растянутые цифры
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
+    # --- 1. Основные растянутые цифры ---
+    # Создаем квадратную заготовку, где цифра точно поместится
+    temp_img = Image.new("RGBA", (150, 150), (0, 0, 0, 0))
+    temp_draw = ImageDraw.Draw(temp_img)
     
-    # Правильный расчет центра для Pillow
-    bbox = draw.textbbox((0, 0), text, font=font)
+    # Центрируем текст на заготовке
+    bbox = temp_draw.textbbox((0, 0), text, font=font)
     tw = bbox[2] - bbox[0]
     th = bbox[3] - bbox[1]
-    x_pos = (W - tw) // 2
-    y_pos = (H - th) // 2 - 10
     
-    # Рисуем белую подложку (Vela OS сама покрасит её в нужный коричневый)
-    draw.text((x_pos, y_pos), text, fill=(255, 255, 255, 255), font=font)
-    img.save(f"assets/Stretched_{i}.png", "PNG")
+    temp_draw.text(((150 - tw) // 2, (150 - th) // 2), text, fill=(255, 255, 255, 255), font=font)
+    
+    # Обрезаем холст строго по границам цифры
+    cropped = temp_img.crop(temp_img.getbbox())
+    
+    # Принудительно растягиваем цифру до размеров экрана Mi Band 10 (50x115)
+    stretched = cropped.resize((FINAL_W, FINAL_H), Image.Resampling.LANCZOS)
+    stretched.save(f"assets/Stretched_{i}.png", "PNG")
 
-    # Контурные цифры для AOD
-    img_aod = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw_aod = ImageDraw.Draw(img_aod)
-    draw_aod.text((x_pos, y_pos), text, fill=(0, 0, 0, 0), 
-                  stroke_width=2, stroke_fill=(255, 255, 255, 255), font=font)
-    img_aod.save(f"assets/AOD_{i}.png", "PNG")
+    # --- 2. Контурные цифры для AOD ---
+    temp_aod = Image.new("RGBA", (150, 150), (0, 0, 0, 0))
+    temp_draw_aod = ImageDraw.Draw(temp_aod)
+    
+    # Рисуем только контур в 3 пикселя (после уменьшения он станет аккуратным в 1-2 пикселя)
+    temp_draw_aod.text(((150 - tw) // 2, (150 - th) // 2), text, fill=(0, 0, 0, 0), 
+                       stroke_width=3, stroke_fill=(255, 255, 255, 255), font=font)
+    
+    cropped_aod = temp_aod.crop(temp_aod.getbbox())
+    stretched_aod = cropped_aod.resize((FINAL_W, FINAL_H), Image.Resampling.LANCZOS)
+    stretched_aod.save(f"assets/AOD_{i}.png", "PNG")
 
-print("Графика успешно создана!")
+print("Все файлы успешно сгенерированы и принудительно растянуты!")
 
-# 2. Упаковываем в чистый BIN-архив
+# 3. Упаковка в BIN-архив
 watchface_bin_path = "AppleStyleFixed.bin"
 with zipfile.ZipFile(watchface_bin_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
     if os.path.exists("watchface.json"):
@@ -50,5 +58,3 @@ with zipfile.ZipFile(watchface_bin_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for file in files:
             if file.endswith(".png"):
                 zipf.write(os.path.join(root, file))
-
-print(f"Циферблат собран: {watchface_bin_path}")
