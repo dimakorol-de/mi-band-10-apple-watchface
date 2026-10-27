@@ -1,5 +1,6 @@
 import os
 import zipfile
+import json
 from PIL import Image, ImageDraw, ImageFont
 
 # Размеры экрана Mi Band 10
@@ -8,7 +9,7 @@ assets_dir = "assets"
 
 print("--- Скрипт запущен! ---")
 
-# 1. Очищаем папку от старых файлов
+# 1. Очищаем старые картинки
 if os.path.exists(assets_dir):
     for file in os.listdir(assets_dir):
         if file.lower().endswith('.png'):
@@ -20,20 +21,19 @@ if os.path.exists(assets_dir):
     for file in os.listdir(assets_dir):
         if file.lower().endswith(('.ttf', '.otf')):
             font_path = os.path.join(assets_dir, file)
-            print(f"Найдена основа! Используем шрифт: {font_path}")
             break
 
 font = None
 if font_path:
     try:
         font = ImageFont.truetype(font_path, 90)
-    except Exception as e:
-        print(f"Предупреждение при загрузке шрифта: {e}")
+    except Exception:
+        pass
 
 if font is None:
     font = ImageFont.load_default()
 
-# 3. Генерируем 10 основных вытянутых цифр
+# 3. Генерируем 10 вытянутых цифр
 for i in range(10):
     text = str(i)
     temp_img = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
@@ -51,26 +51,100 @@ for i in range(10):
         
     cropped = temp_img.crop(bbox)
     stretched = cropped.resize((FINAL_W, FINAL_H), Image.Resampling.LANCZOS)
-    
-    # Сохраняем файлы напрямую
     stretched.save(f"assets/Stretched_{i}.png", "PNG")
-    print(f"Успешно создана цифра Stretched_{i}.png")
 
-print("--- Все картинки созданы! Начинаем правильную HyperOS-упаковку. ---")
+print("Картинки успешно сгенерированы!")
 
-# 4. Собираем финальный .bin с правильной внутренней структурой каталогов
+# 4. Принудительно генерируем чистый watchface.json программно
+wf_data = {
+  "sdk_version": "3.0.0",
+  "device_id": "xiaomi.smartband.10",
+  "device_type": "smart_band",
+  "meta": {
+    "name": "Apple Style Fixed",
+    "version": "1.0.5",
+    "author": "Custom",
+    "description": "Apple Watch Stretched Style with Fixed Complication"
+  },
+  "settings": {
+    "fps": 30,
+    "hardware_acceleration": True,
+    "cache_resources": True
+  },
+  "theme": {
+    "default_color_index": 0,
+    "color_palettes": [
+      { "name": "Apple Umber", "primary": "#D4A373", "secondary": "#7A5C43" },
+      { "name": "Pure White", "primary": "#FFFFFF", "secondary": "#888888" }
+    ]
+  },
+  "views": {
+    "main": {
+      "background": { "color": "#000000" },
+      "components": [
+        {
+          "type": "date",
+          "format": "EEE, d MMM",
+          "locale": "ru_RU",
+          "x": 96, "y": 45,
+          "align": "center",
+          "font": "system_16",
+          "color": "@theme.primary"
+        },
+        {
+          "type": "time_images",
+          "x": 96, "y": 120,
+          "align": "center",
+          "spacing": -1,
+          "resource_prefix": "assets/Stretched_",
+          "color_mask": "@theme.primary"
+        },
+        {
+          "type": "complication_slot",
+          "id": "slot_bottom",
+          "x": 96, "y": 370,
+          "align": "center",
+          "radius": 28,
+          "supported_types": ["steps", "heart_rate", "sleep", "flashlight"],
+          "default_type": "steps",
+          "style": {
+            "icon_color": "@theme.primary",
+            "progress_color": "@theme.primary",
+            "bg_color": "#1A1A1A"
+          }
+        }
+      ]
+    },
+    "aod": {
+      "enabled": true,
+      "background": { "color": "#000000" },
+      "components": [
+        {
+          "type": "time_images",
+          "x": 96, "y": 120,
+          "align": "center",
+          "spacing": -1,
+          "resource_prefix": "assets/Stretched_",
+          "color_mask": "@theme.secondary"
+        }
+      ]
+    }
+  }
+}
+
+with open("watchface.json", "w", encoding="utf-8") as f:
+    json.dump(wf_data, f, indent=2, ensure_ascii=False)
+
+print("Файл watchface.json успешно перезаписан!")
+
+# 5. Собираем финальный .bin
 watchface_bin_path = "AppleStyleFixed.bin"
 with zipfile.ZipFile(watchface_bin_path, 'w', zipfile.ZIP_STORED) as zipf:
-    # Важно: Записываем watchface.json в самый корень архива
-    if os.path.exists("watchface.json"):
-        zipf.write("watchface.json", "watchface.json")
-    
-    # Записываем картинки строго по путям без создания лишних дублирующих подпапок
+    zipf.write("watchface.json", "watchface.json")
     for i in range(10):
         img_name = f"Stretched_{i}.png"
         local_path = os.path.join(assets_dir, img_name)
         if os.path.exists(local_path):
-            # Внутри bin-файла путь должен быть строго: assets/Stretched_X.png
             zipf.write(local_path, f"assets/{img_name}")
 
-print(f"Готово! Сборка циферблата завершена: {watchface_bin_path}")
+print(f"Сборка завершена: {watchface_bin_path}")
