@@ -134,20 +134,27 @@ wf_data = {
   }
 }
 
-# Записываем чистую конфигурацию поверх старой в рабочей среде сборщика
 with open("watchface.json", "w", encoding="utf-8") as f:
     json.dump(wf_data, f, indent=2, ensure_ascii=False)
 
 print("Файл watchface.json успешно перезаписан на чистый вариант!")
 
-# 5. Собираем финальный .bin с правильным несжатым методом (ZIP_STORED) для мода
+# 5. Собираем финальный .bin БЕЗ скрытых системных тегов Linux (UT)
 watchface_bin_path = "AppleStyleFixed.bin"
 with zipfile.ZipFile(watchface_bin_path, 'w', zipfile.ZIP_STORED) as zipf:
-    zipf.write("watchface.json", "watchface.json")
+    # Принудительно очищаем системные метаданные для совместимости с Mi Fitness
+    json_info = zipfile.ZipInfo("watchface.json")
+    json_info.create_system = 0  # Игнорировать Unix-атрибуты (убирает UT)
+    with open("watchface.json", "r", encoding="utf-8") as f:
+        zipf.writestr(json_info, f.read())
+    
     for i in range(10):
         img_name = f"Stretched_{i}.png"
         local_path = os.path.join(assets_dir, img_name)
         if os.path.exists(local_path):
-            zipf.write(local_path, f"assets/{img_name}")
+            img_info = zipfile.ZipInfo(f"assets/{img_name}")
+            img_info.create_system = 0  # Игнорировать Unix-атрибуты (убирает UT)
+            with open(local_path, "rb") as f:
+                zipf.writestr(img_info, f.read())
 
-print(f"Сборка полностью завершена: {watchface_bin_path}")
+print(f"Сборка полностью завершена по стандартам HyperOS: {watchface_bin_path}")
