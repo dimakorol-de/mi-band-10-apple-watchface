@@ -1,0 +1,73 @@
+{
+  "sdk_version": "3.0.0",
+  "device": "xiaomi.smartband.10",
+  "meta": {
+    "name": "Apple Style Minimal",
+    "version": "1.0.1",
+    "author": "Custom",
+    "description": "Optimized Apple Watch Stretched Style"
+  },
+  "settings": {
+    "fps": 30,
+    "hardware_acceleration": true,
+    "cache_resources": true
+  },
+  "theme": {
+    "default_color_index": 0,
+    "color_palettes": [
+      { "name": "Pure White", "primary": "#FFFFFF", "secondary": "#888888" },
+      { "name": "Apple Gold", "primary": "#E6C79C", "secondary": "#7D6B53" }
+    ]
+  },
+  "views": {
+    "main": {
+      "background": { "color": "#000000" },
+      "components": [
+        {
+          "type": "date",
+          "format": "EEE, d MMM",
+          "locale": "ru_RU",
+          "x": 96, "y": 45,
+          "align": "center",
+          "font": "system_16",
+          "color": "@theme.primary"
+        },
+        {
+          "type": "time_images",
+          "x": 96, "y": 120,
+          "align": "center",
+          "spacing": -1,
+          "resource_prefix": "assets/Stretched_",
+          "color_mask": "@theme.primary"
+        },
+        {
+          "type": "interactive_widget",
+          "x": 96, "y": 370,
+          "align": "center",
+          "radius": 28,
+          "supported_types": ["steps", "heart_rate", "sleep", "flashlight"],
+          "default_type": "steps",
+          "style": {
+            "icon_color": "@theme.primary",
+            "progress_color": "@theme.primary",
+            "bg_color": "#1A1A1A"
+          }
+        }
+      ]
+    },
+    "aod": {
+      "enabled": true,
+      "background": { "color": "#000000" },
+      "components": [
+        {
+          "type": "time_images",
+          "x": 96, "y": 120,
+          "align": "center",
+          "spacing": -1,
+          "resource_prefix": "assets/AOD_",
+          "color_mask": "@theme.secondary"
+        }
+      ]
+    }
+  }
+}
