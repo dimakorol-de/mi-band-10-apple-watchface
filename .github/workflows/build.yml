@@ -1,10 +1,7 @@
-name: Build and Pack Watchface
+name: Build and Pack HyperOS BIN
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -16,16 +13,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare Flat Directory
-        run: |
-          mkdir -p clean_project
-          # Копируем только актуальные файлы под архитектуру HyperOS
-          cp main.lua clean_project/
-          cp app.json clean_project/
-          cp -r assets clean_project/
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-level: '3.10'
 
-      - name: Upload Raw Source Folder
+      - name: Clone Mi-Create Compiler
+        run: |
+          git clone https://github.com compiler
+          pip install -r compiler/requirements.txt
+
+      - name: Prepare Watchface Folder
+        run: |
+          mkdir -p project_dir
+          cp main.lua project_dir/
+          cp app.json project_dir/
+          cp -r assets project_dir/
+
+      - name: Compile to BIN
+        run: |
+          # Запуск компилятора ooflet для создания бинарного контейнера
+          python compiler/tools/build.py --project project_dir --output build_out/
+          
+          # Переименовываем скомпилированный файл в понятный часам resource.bin
+          mkdir -p final_bin
+          cp build_out/*.face final_bin/resource.bin
+
+      - name: Upload Finished BIN File
         uses: actions/upload-artifact@v4
         with:
-          name: mi-band-10-apple-watchface-source
-          path: clean_project/
+          name: Apple_Watchface_MiBand10_BIN
+          path: final_bin/resource.bin
