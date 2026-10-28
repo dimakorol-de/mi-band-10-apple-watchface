@@ -15,10 +15,10 @@ jobs:
 
     - name: Compile Monolithic HyperOS BIN
       run: |
-        # -0: Без сжатия (требование HyperOS)
-        # -j: Мусорные пути Linux не пишутся в имена файлов
-        # -X: Полностью вырезает Extra Fields (телефон перестанет видеть архив как папку)
-        zip -0jX watchface.bin watchface.json assets/Stretched_*.png
+        # -0: Без сжатия байтов (требование прошивки часов)
+        # -r: Строгое сохранение путей к картинкам (чтобы архив не ломался)
+        # -X: Полностью вырезает Extra Fields (бинарник не будет открываться как папка)
+        zip -0rX watchface.bin watchface.json assets/
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
