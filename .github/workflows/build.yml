@@ -13,15 +13,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Compile Official HyperOS BIN
+    - name: Compile Official HyperOS Face Package
       run: |
-        # -0: Без сжатия байтов (строгое требование HyperOS)
-        # -j: Полностью удаляет папки и пути, делая файл абсолютно плоским
-        # -X: Вырезает расширенные атрибуты времени Linux (Extra Fields)
-        zip -0jX watchface.bin watchface.json assets/Stretched_*.png
+        # Собираем монолитный фабричный пакет .face без сжатия байтов (-0)
+        # Параметр -X вырезает Extra Fields, убирая ошибки распознавания на iPhone
+        zip -0rX AppleStyleFixed.face watchface.json assets/
 
-    - name: Upload Finished Watchface (.bin)
+    - name: Upload Finished Watchface (.face)
       uses: actions/upload-artifact@v4
       with:
         name: AppleStyleMinimal-MiBand10
-        path: watchface.bin
+        path: AppleStyleFixed.face
