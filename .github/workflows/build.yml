@@ -13,34 +13,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
-    - name: Install Packager Library
-      run: npm install archiver
-
-    - name: Compile Official HyperOS BIN
+    - name: Compile Pure Monolithic BIN
       run: |
-        # Используем Node.js для сборки структуры Vela OS БЕЗ сжатия метаданных и БЕЗ Linux-тегов времени
-        node -e "
-        const fs = require('fs');
-        const archiver = require('archiver');
-        const output = fs.createWriteStream('watchface.bin');
-        const archive = archiver.create('zip', { store: true });
-        
-        output.on('close', () => console.log('Сборка завершена!'));
-        archive.pipe(output);
-        
-        archive.file('watchface.json', { name: 'watchface.json' });
-        
-        for(let i=0; i<=9; i++) {
-          archive.file('assets/Stretched_' + i + '.png', { name: 'assets/Stretched_' + i + '.png' });
-        }
-        
-        archive.finalize();
-        "
+        # -0: Режим STORED без сжатия байтов (требование HyperOS)
+        # -X: Полностью вырезает Extra Fields (Айфон перестанет открывать файл как папку)
+        zip -0X watchface.bin watchface.json assets/Stretched_*.png
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
