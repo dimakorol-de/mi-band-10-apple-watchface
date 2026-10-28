@@ -13,16 +13,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
+    - name: Prepare Flat Directory
+      run: |
+        mkdir -p clean_project
+        cp watchface.json clean_project/
+        cp -r assets clean_project/
 
-    - name: Run Clean Packager Script
-      run: python generate_assets.py
-
-    - name: Upload Finished Watchface (.face)
+    - name: Upload Raw Source Folder
       uses: actions/upload-artifact@v4
       with:
         name: AppleStyleMinimal-MiBand10
-        path: AppleStyleFixed.face
+        path: clean_project/
