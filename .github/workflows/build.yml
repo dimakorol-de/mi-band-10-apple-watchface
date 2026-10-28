@@ -27,7 +27,7 @@ jobs:
         const fs = require('fs');
         const archiver = require('archiver');
         const output = fs.createWriteStream('watchface.bin');
-        const archive = archiver('zip', { store: true });
+        const archive = archiver.create('zip', { store: true });
         
         output.on('close', () => console.log('Сборка завершена!'));
         archive.pipe(output);
