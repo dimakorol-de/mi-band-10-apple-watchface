@@ -13,13 +13,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Compile Official HyperOS RPK via Linux Zip
+    - name: Compile Official HyperOS BIN via Linux Zip
       run: |
-        # Упаковываем файлы без системных тегов Linux (параметр -X), чтобы убрать ошибку прошивки
-        zip -0rX AppleStyleFixed.rpk watchface.json assets/
+        # Принудительно собираем циферблат в расширении .bin с отключением Unix-тегов времени (-X)
+        zip -0rX watchface.bin watchface.json assets/
 
-    - name: Upload Finished Watchface (.rpk)
+    - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
       with:
         name: AppleStyleMinimal-MiBand10
-        path: AppleStyleFixed.rpk
+        path: watchface.bin
