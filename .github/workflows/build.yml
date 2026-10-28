@@ -15,9 +15,9 @@ jobs:
 
     - name: Compile Pure Monolithic BIN
       run: |
-        # -0: Без сжатия (требование HyperOS)
-        # -X: Полностью удаляет Extra Fields (файл перестанет открываться как папка)
-        zip -0rX watchface.bin watchface.json assets/
+        # Используем tar вместо zip: он склеивает файлы в чистый бинарный поток
+        # Без сжатия, без скрытых тегов времени и БЕЗ заголовков ZIP-архивов
+        tar -cf watchface.bin watchface.json assets/
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
