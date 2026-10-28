@@ -13,15 +13,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Prepare Clean Directory for Upload
+    - name: Compile Official HyperOS BIN
       run: |
-        # Создаем чистую временную папку и копируем туда только самое необходимое
-        mkdir -p build_flat
-        cp watchface.json build_flat/
-        cp -r assets build_flat/
+        # -0: Без сжатия байтов (строгое требование HyperOS)
+        # -j: Полностью удаляет папки и пути, делая файл абсолютно плоским
+        # -X: Вырезает расширенные атрибуты времени Linux (Extra Fields)
+        zip -0jX watchface.bin watchface.json assets/Stretched_*.png
 
-    - name: Upload Clean Files Without Compression
+    - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
       with:
         name: AppleStyleMinimal-MiBand10
-        path: build_flat/
+        path: watchface.bin
