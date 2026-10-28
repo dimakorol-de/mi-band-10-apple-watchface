@@ -13,12 +13,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Compile Monolithic HyperOS BIN
+    - name: Compile Pure Monolithic BIN
       run: |
-        # -0: Без сжатия байтов (требование прошивки часов)
-        # -r: Строгое сохранение путей к картинкам (чтобы архив не ломался)
-        # -X: Полностью вырезает Extra Fields (бинарник не будет открываться как папка)
-        zip -0rX watchface.bin watchface.json assets/
+        # Используем tar вместо zip: он склеивает файлы в чистый бинарный поток
+        # Без сжатия, без скрытых тегов времени и БЕЗ заголовков ZIP-архивов
+        tar -cf watchface.bin watchface.json assets/
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
