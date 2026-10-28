@@ -13,13 +13,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Compile Official HyperOS BIN via Linux Zip
+    - name: Compile Pure HyperOS BIN
       run: |
-        # Принудительно собираем циферблат в расширении .bin с отключением Unix-тегов времени (-X)
-        zip -0rX watchface.bin watchface.json assets/
+        # Собираем .bin напрямую из твоих картинок БЕЗ тегов Linux (UT), чтобы убрать ошибку -1
+        zip -0rX AppleStyleFixed.bin watchface.json assets/
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
       with:
-        name: AppleStyleMinimal-MiBand10
-        path: watchface.bin
+        name: watchface-pack
+        path: AppleStyleFixed.bin
