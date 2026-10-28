@@ -13,11 +13,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Compile Official HyperOS Face Package
-      run: |
-        # Собираем монолитный фабричный пакет .face без сжатия байтов (-0)
-        # Параметр -X вырезает Extra Fields, убирая ошибки распознавания на iPhone
-        zip -0rX AppleStyleFixed.face watchface.json assets/
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Run Clean Packager Script
+      run: python generate_assets.py
 
     - name: Upload Finished Watchface (.face)
       uses: actions/upload-artifact@v4
