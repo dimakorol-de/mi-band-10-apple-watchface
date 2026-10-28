@@ -13,23 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Download Mi-Create Compiler via ZIP
-        run: |
-          # Скачиваем архив напрямую с помощью curl
-          curl -L "https://github.com" -o compiler.zip
-          # Распаковываем его
-          unzip compiler.zip
-          # Переименовываем папку для удобства
-          mv Mi-Create-main compiler
-          # Устанавливаем зависимости
-          cd compiler
-          pip install -r requirements.txt
-
       - name: Prepare Watchface Folder
         run: |
           mkdir -p project_dir
@@ -37,14 +20,15 @@ jobs:
           cp app.json project_dir/
           cp -r assets project_dir/
 
-      - name: Compile to BIN
+      - name: Pack to BIN Container
         run: |
-          python compiler/tools/build.py --project project_dir --output build_out/
-          mkdir -p final_bin
-          cp build_out/*.face final_bin/resource.bin || cp build_out/*.bin final_bin/resource.bin
+          cd project_dir
+          # Упаковываем файлы без сжатия (флаг -0), как того требует HyperOS для быстрого чтения из памяти
+          zip -0 -r ../resource.bin main.lua app.json assets/
+          cd ..
 
       - name: Upload Finished BIN File
         uses: actions/upload-artifact@v4
         with:
           name: Apple_Watchface_MiBand10_BIN
-          path: final_bin/resource.bin
+          path: resource.bin
