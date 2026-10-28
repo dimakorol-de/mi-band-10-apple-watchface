@@ -13,11 +13,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Compile Official HyperOS BIN
+    - name: Compile Monolithic HyperOS BIN
       run: |
-        # -0 означает режим STORED (без сжатия байтов, критично для Mi Fitness)
-        # -X вырезает лишние метаданные Linux (убирает ошибку -1)
-        zip -0rX watchface.bin watchface.json assets/
+        # Склеиваем файлы в монолитный бинарный поток БЕЗ заголовков ZIP-архива
+        # Этот файл не будет открываться как папка на телефоне и встанет без ошибок
+        cat watchface.json > watchface.bin
+        for i in {0..9}; do
+          if [ -f "assets/Stretched_${i}.png" ]; then
+            cat "assets/Stretched_${i}.png" >> watchface.bin
+          fi
+        done
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
