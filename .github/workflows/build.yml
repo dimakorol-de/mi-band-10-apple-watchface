@@ -18,11 +18,15 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Clone Mi-Create Compiler
-        env:
-          REPO_URL: "https://github.com"
+      - name: Download Mi-Create Compiler via ZIP
         run: |
-          git clone "$REPO_URL" compiler
+          # Скачиваем архив напрямую с помощью curl
+          curl -L "https://github.com" -o compiler.zip
+          # Распаковываем его
+          unzip compiler.zip
+          # Переименовываем папку для удобства
+          mv Mi-Create-main compiler
+          # Устанавливаем зависимости
           cd compiler
           pip install -r requirements.txt
 
