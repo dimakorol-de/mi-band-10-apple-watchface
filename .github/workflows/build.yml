@@ -15,14 +15,10 @@ jobs:
 
     - name: Compile Monolithic HyperOS BIN
       run: |
-        # Склеиваем файлы в монолитный бинарный поток БЕЗ заголовков ZIP-архива
-        # Этот файл не будет открываться как папка на телефоне и встанет без ошибок
-        cat watchface.json > watchface.bin
-        for i in {0..9}; do
-          if [ -f "assets/Stretched_${i}.png" ]; then
-            cat "assets/Stretched_${i}.png" >> watchface.bin
-          fi
-        done
+        # -0: Без сжатия (требование HyperOS)
+        # -j: Мусорные пути Linux не пишутся в имена файлов
+        # -X: Полностью вырезает Extra Fields (телефон перестанет видеть архив как папку)
+        zip -0jX watchface.bin watchface.json assets/Stretched_*.png
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
