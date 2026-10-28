@@ -13,14 +13,37 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Compile Pure Monolithic BIN
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Packager Library
+      run: npm install archiver
+
+    - name: Compile Official HyperOS BIN
       run: |
-        # Склеиваем файлы в монолитный бинарный поток по стандартам Vela OS
-        tar -cf watchface.bin watchface.json assets/
+        # Используем Node.js для сборки структуры Vela OS БЕЗ сжатия метаданных и БЕЗ Linux-тегов времени
+        node -e "
+        const fs = require('fs');
+        const archiver = require('archiver');
+        const output = fs.createWriteStream('watchface.bin');
+        const archive = archiver.create('zip', { store: true });
+        
+        output.on('close', () => console.log('Сборка завершена!'));
+        archive.pipe(output);
+        
+        archive.file('watchface.json', { name: 'watchface.json' });
+        
+        for(let i=0; i<=9; i++) {
+          archive.file('assets/Stretched_' + i + '.png', { name: 'assets/Stretched_' + i + '.png' });
+        }
+        
+        archive.finalize();
+        "
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
       with:
-        # Принудительно заставляем сервер выдать чистый готовый .bin
-        name: AppleStyleFixed.bin
+        name: AppleStyleMinimal-MiBand10
         path: watchface.bin
