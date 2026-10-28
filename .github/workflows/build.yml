@@ -13,11 +13,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Compile Pure Monolithic BIN
+    - name: Compile Monolithic HyperOS BIN
       run: |
-        # -0: Режим STORED без сжатия байтов (требование HyperOS)
-        # -X: Полностью вырезает Extra Fields (Айфон перестанет открывать файл как папку)
-        zip -0X watchface.bin watchface.json assets/Stretched_*.png
+        # -0: Без сжатия байтов (требование HyperOS)
+        # -j: Полностью удаляет пути и папки из структуры файлов ( junk paths )
+        # -X: Вырезает расширенные атрибуты времени Linux (Extra Fields)
+        zip -0jX watchface.bin watchface.json assets/Stretched_*.png
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
