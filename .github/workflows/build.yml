@@ -1,26 +1,31 @@
-name: Build Mi Band 10 Watchface
+name: Build and Pack Watchface
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Prepare Flat Directory
-      run: |
-        mkdir -p clean_project
-        cp watchface.json clean_project/
-        cp -r assets clean_project/
+      - name: Prepare Flat Directory
+        run: |
+          mkdir -p clean_project
+          # Копируем только актуальные файлы под архитектуру HyperOS
+          cp main.lua clean_project/
+          cp app.json clean_project/
+          cp -r assets clean_project/
 
-    - name: Upload Raw Source Folder
-      uses: actions/upload-artifact@v4
-      with:
-        name: AppleStyleMinimal-MiBand10
-        path: clean_project/
+      - name: Upload Raw Source Folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: mi-band-10-apple-watchface-source
+          path: clean_project/
