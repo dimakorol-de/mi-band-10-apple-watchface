@@ -1,0 +1,8 @@
+{
+  "appType": "watchface",
+  "id": "com.custom.apple_watchface",
+  "version": "1.0.8",
+  "targetDevice": "xiaomi.smartband.10",
+  "apiLevel": "4.0.0",
+  "main": "main.lua"
+}
