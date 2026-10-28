@@ -15,12 +15,12 @@ jobs:
 
     - name: Compile Pure Monolithic BIN
       run: |
-        # Собираем файлы в чистый бинарный поток по стандартам прошивки Vela OS
-        tar -cf watchface.bin watchface.json assets/
+        # -0: Без сжатия (требование HyperOS)
+        # -X: Полностью удаляет Extra Fields (файл перестанет открываться как папка)
+        zip -0rX watchface.bin watchface.json assets/
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
       with:
-        # Важно: Принудительно заставляем сервер выдать чистый .bin
-        name: AppleStyleFixed.bin
+        name: AppleStyleMinimal-MiBand10
         path: watchface.bin
