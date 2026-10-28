@@ -13,13 +13,36 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Compile Pure HyperOS BIN
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Compile Official HyperOS BIN
       run: |
-        # Собираем .bin напрямую из твоих картинок БЕЗ тегов Linux (UT), чтобы убрать ошибку -1
-        zip -0rX AppleStyleFixed.bin watchface.json assets/
+        # Используем встроенный Node.js скрипт для сборки правильной структуры Vela OS БЕЗ сжатия метаданных
+        node -e "
+        const fs = require('fs');
+        const archiver = require('archiver');
+        const output = fs.createWriteStream('watchface.bin');
+        const archive = archiver('zip', { store: true }); // Режим ZIP_STORED (без сжатия)
+        
+        output.on('close', () => console.log('Сборка завершена!'));
+        archive.pipe(output);
+        
+        // Пишем json строго в корень
+        archive.file('watchface.json', { name: 'watchface.json' });
+        
+        // Пишем картинки строго по путям без Linux-тегов
+        for(let i=0; i<=9; i++) {
+          archive.file('assets/Stretched_' + i + '.png', { name: 'assets/Stretched_' + i + '.png' });
+        }
+        
+        archive.finalize();
+        "
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
       with:
-        name: watchface-pack
-        path: AppleStyleFixed.bin
+        name: AppleStyleMinimal-MiBand10
+        path: watchface.bin
