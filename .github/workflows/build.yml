@@ -13,33 +13,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
-    - name: Install Packager Library
-      run: npm install archiver
-
     - name: Compile Official HyperOS BIN
       run: |
-        node -e "
-        const fs = require('fs');
-        const archiver = require('archiver');
-        const output = fs.createWriteStream('watchface.bin');
-        const archive = archiver.create('zip', { store: true });
-        
-        output.on('close', () => console.log('Сборка завершена!'));
-        archive.pipe(output);
-        
-        archive.file('watchface.json', { name: 'watchface.json' });
-        
-        for(let i=0; i<=9; i++) {
-          archive.file('assets/Stretched_' + i + '.png', { name: 'assets/Stretched_' + i + '.png' });
-        }
-        
-        archive.finalize();
-        "
+        # -0 означает режим STORED (без сжатия байтов, критично для Mi Fitness)
+        # -X вырезает лишние метаданные Linux (убирает ошибку -1)
+        zip -0rX watchface.bin watchface.json assets/
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
