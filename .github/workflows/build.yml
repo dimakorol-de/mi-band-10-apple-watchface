@@ -15,12 +15,12 @@ jobs:
 
     - name: Compile Pure Monolithic BIN
       run: |
-        # Используем tar вместо zip: он склеивает файлы в чистый бинарный поток
-        # Без сжатия, без скрытых тегов времени и БЕЗ заголовков ZIP-архивов
+        # Склеиваем файлы в монолитный бинарный поток по стандартам Vela OS
         tar -cf watchface.bin watchface.json assets/
 
     - name: Upload Finished Watchface (.bin)
       uses: actions/upload-artifact@v4
       with:
-        name: AppleStyleMinimal-MiBand10
+        # Принудительно заставляем сервер выдать чистый готовый .bin
+        name: AppleStyleFixed.bin
         path: watchface.bin
