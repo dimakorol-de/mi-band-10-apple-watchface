@@ -19,9 +19,12 @@ jobs:
           python-version: '3.10'
 
       - name: Clone Mi-Create Compiler
+        env:
+          REPO_URL: "https://github.com"
         run: |
-          git clone https://github.com compiler
-          pip install -r compiler/requirements.txt
+          git clone "$REPO_URL" compiler
+          cd compiler
+          pip install -r requirements.txt
 
       - name: Prepare Watchface Folder
         run: |
@@ -32,12 +35,9 @@ jobs:
 
       - name: Compile to BIN
         run: |
-          # Запуск компилятора ooflet для создания бинарного контейнера
           python compiler/tools/build.py --project project_dir --output build_out/
-          
-          # Переименовываем скомпилированный файл в понятный часам resource.bin
           mkdir -p final_bin
-          cp build_out/*.face final_bin/resource.bin
+          cp build_out/*.face final_bin/resource.bin || cp build_out/*.bin final_bin/resource.bin
 
       - name: Upload Finished BIN File
         uses: actions/upload-artifact@v4
