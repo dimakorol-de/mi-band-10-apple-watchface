@@ -13,16 +13,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-
-    - name: Install Pillow
-      run: pip install Pillow
-
-    - name: Run Script Generator and Packager
-      run: python generate_assets.py
+    - name: Compile Official HyperOS RPK via Linux Zip
+      run: |
+        # Упаковываем файлы без системных тегов Linux (параметр -X), чтобы убрать ошибку прошивки
+        zip -0rX AppleStyleFixed.rpk watchface.json assets/
 
     - name: Upload Finished Watchface (.rpk)
       uses: actions/upload-artifact@v4
