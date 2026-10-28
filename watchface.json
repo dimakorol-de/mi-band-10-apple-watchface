@@ -3,22 +3,15 @@
   "device_id": "xiaomi.smartband.10",
   "device_type": "smart_band",
   "meta": {
-    "name": "Apple Style Fixed",
-    "version": "1.0.5",
+    "name": "Apple Style Handcrafted",
+    "version": "1.0.6",
     "author": "Custom",
-    "description": "Apple Watch Stretched Style with Fixed Complication"
+    "description": "Apple Watch Stretched Style Handcrafted"
   },
   "settings": {
     "fps": 30,
     "hardware_acceleration": true,
     "cache_resources": true
-  },
-  "theme": {
-    "default_color_index": 0,
-    "color_palettes": [
-      { "name": "Apple Umber", "primary": "#D4A373", "secondary": "#7A5C43" },
-      { "name": "Pure White", "primary": "#FFFFFF", "secondary": "#888888" }
-    ]
   },
   "views": {
     "main": {
@@ -31,15 +24,14 @@
           "x": 96, "y": 45,
           "align": "center",
           "font": "system_16",
-          "color": "@theme.primary"
+          "color": "#D4A373"
         },
         {
           "type": "time_images",
           "x": 96, "y": 120,
           "align": "center",
           "spacing": -1,
-          "resource_prefix": "assets/Stretched_",
-          "color_mask": "@theme.primary"
+          "resource_prefix": "assets/Stretched_"
         },
         {
           "type": "complication_slot",
@@ -50,8 +42,8 @@
           "supported_types": ["steps", "heart_rate", "sleep", "flashlight"],
           "default_type": "steps",
           "style": {
-            "icon_color": "@theme.primary",
-            "progress_color": "@theme.primary",
+            "icon_color": "#D4A373",
+            "progress_color": "#D4A373",
             "bg_color": "#1A1A1A"
           }
         }
@@ -66,8 +58,7 @@
           "x": 96, "y": 120,
           "align": "center",
           "spacing": -1,
-          "resource_prefix": "assets/Stretched_",
-          "color_mask": "@theme.secondary"
+          "resource_prefix": "assets/Stretched_"
         }
       ]
     }
